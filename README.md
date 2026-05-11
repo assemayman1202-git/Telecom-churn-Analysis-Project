@@ -7,7 +7,7 @@
 
 ## 📌 Project Overview
 
-A full-scale business intelligence project analyzing **7,043 telecom customer records** across 35 attributes including demographics, service usage, billing behavior, and churn reasons. Data was modeled using a **star schema in Power BI** with a central fact table and 5 dimension tables, producing a **7-page interactive dashboard** — uncovering critical insights around churn drivers, revenue at risk, customer segmentation, and retention strategy.
+A full-scale business intelligence project analyzing **7,043 telecom customer records** across 35 attributes including demographics, service usage, billing behavior, and churn reasons. Data was modeled using a **star schema in Power BI** with a central fact table and 5 dimension tables, producing interactive dashboards** — uncovering critical insights around churn drivers, revenue at risk, customer segmentation, and retention strategy.
 
 | Metric | Value |
 |--------|-------|
