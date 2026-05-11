@@ -52,7 +52,7 @@ telecom-churn-analysis/
 
 ## 🏗️ Data Model — Star Schema
 
-![Schema](telecom_schema.png)
+![telecom_schema](telecom%20schema.png)
 
 The Power BI data model follows a **star schema** design with one central fact table surrounded by 5 dimension tables and a dedicated measures table.
 
@@ -84,7 +84,7 @@ The dashboard spans **7 pages** — Overview, Revenue, Customers, Details, More 
 
 ### Page 1 — Overview
 
-![Overview](telecom_overview.png)
+![telecom_overview](telecom%20overview.png)
 
 **KPIs:** Total Revenue ($21.37M) · Churn Rate (26.54%) · Revenue of Churned Customers ($73.35) · Lost MRR ($137.09K) · Monthly Rev per Customer ($61.74) · MRR ($291.40K)
 
@@ -100,7 +100,7 @@ The dashboard spans **7 pages** — Overview, Revenue, Customers, Details, More 
 
 ### Page 2 — Revenue
 
-![Revenue](telecom_revenue.png)
+![telecom_revenue](telecom%20revenue.png)
 
 **KPIs:** Total Revenue ($21.37M) · Revenue Lost ($3.68M) · Net Revenue ($17.69M) · Churn Rate (26.54%) · Average Tenure (32 months)
 
@@ -115,7 +115,7 @@ The dashboard spans **7 pages** — Overview, Revenue, Customers, Details, More 
 
 ### Page 3 — Customers
 
-![Customers](telecom_customer.png)
+![telecom customers](telecom%20customer.png)
 
 **KPIs:** Total Revenue ($21.37M) · Revenue Lost ($3.68M) · Net Revenue ($17.69M) · Churn Rate (26.54%) · Total Customers (7K) · Revenue per Customer ($3.03K)
 
@@ -129,7 +129,7 @@ The dashboard spans **7 pages** — Overview, Revenue, Customers, Details, More 
 
 ### Page 4 — Details
 
-![Details](telecom_details.png)
+![telecom_details](telecom%20details.png)
 
 **KPIs:** Total Revenue ($21.37M) · Total Refunds ($13.82K) · Churn Rate (26.54%) · Average Tenure (32 months)
 
@@ -144,7 +144,7 @@ The dashboard spans **7 pages** — Overview, Revenue, Customers, Details, More 
 
 ### Page 5 — More Details
 
-![More Details](telecom_more_details.png)
+![telecom_more_details](telecom%20more%20details.png)
 
 **KPIs:** Total Revenue ($21.37M) · Total Extra Charges ($48K) · Total Charges ($16.06M) · Average Monthly Charges ($63.60) · Churn Rate (26.54%)
 
