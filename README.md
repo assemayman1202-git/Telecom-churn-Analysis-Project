@@ -1,16 +1,17 @@
 #!/bin/bash
 # =============================================================
-#  Telecom Churn Analysis — GitHub Repository Setup Script
+#  Restaurant Chain Performance Analytics
+#  GitHub Repository Setup Script
 #  Run: bash setup_repo.sh
-#  Requirements: git, curl (images downloaded automatically)
+#  Place this script in the same folder as your dashboard images
 # =============================================================
 
 set -e
 
-REPO="telecom-churn-analysis"
+REPO="restaurant-analytics"
 
-echo "🚀 Creating repository: $REPO"
-mkdir -p "$REPO"/{dashboards,docs,data,recommendations}
+echo "🍽️  Creating repository: $REPO"
+mkdir -p "$REPO"/{screenshots,data,powerbi,sql}
 cd "$REPO"
 
 # ── Git init ─────────────────────────────────────────────────
@@ -21,14 +22,13 @@ git branch -M main
 # .gitignore
 # =============================================================
 cat > .gitignore << 'EOF'
-# Power BI
-*.pbix
-*.pbit
-
-# Raw data
-data/raw/
+# Large data files
 data/*.csv
-data/*.xlsx
+data/*.json
+data/raw/
+
+# Power BI binary (optional — uncomment if too large)
+# powerbi/*.pbix
 
 # OS
 .DS_Store
@@ -43,769 +43,406 @@ EOF
 # README.md
 # =============================================================
 cat > README.md << 'HEREDOC'
-# 📡 Telecom Customer Churn Analysis
+# 🍽️ Restaurant Chain Performance Analytics
+### End-to-End Data Engineering & Business Intelligence Pipeline
 
-> A comprehensive Power BI analysis of customer churn behavior across 7,043 customers — uncovering key drivers, risk segments, and actionable retention strategies worth **$8M+** in Year 1 impact.
-
----
-
-## 📊 Dashboard Gallery
-
-### 1. Overview Dashboard
-![Overview Dashboard](dashboards/01_overview.png)
-> Key metrics at a glance: churn rate, MRR, lost revenue, and churn breakdown by category and reason.
+![Power BI](https://img.shields.io/badge/Power%20BI-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)
+![Databricks](https://img.shields.io/badge/Databricks-FF3621?style=for-the-badge&logo=databricks&logoColor=white)
+![Apache Spark](https://img.shields.io/badge/Apache%20Spark-E25A1C?style=for-the-badge&logo=apachespark&logoColor=white)
+![SQL](https://img.shields.io/badge/SQL-4479A1?style=for-the-badge&logo=postgresql&logoColor=white)
 
 ---
 
-### 2. Revenue Dashboard
-![Revenue Dashboard](dashboards/02_revenue.png)
-> Revenue by offer, internet type, payment method, contract type, and customer tenure trends.
+## 📌 Project Overview
 
----
-
-### 3. Customers Dashboard
-![Customers Dashboard](dashboards/03_customers.png)
-> Customer distribution by status, gender, number of dependents, and age — with revenue impact.
-
----
-
-### 4. Details Dashboard
-![Details Dashboard](dashboards/04_details.png)
-> Churn rate by population bracket, age, tenure, refund status, and number of dependents.
-
----
-
-### 5. More Details Dashboard
-![More Details Dashboard](dashboards/05_more_details.png)
-> Deep-dive into premium services, streaming, data usage, long distance charges, and extra charges.
-
----
-
-## 🗃️ Data Model — Star Schema
-
-![Power BI Schema](dashboards/schema.png)
-
-The Power BI model follows a **star schema** with one central fact table and five dimension tables:
-
-| Table | Type | Description |
-|---|---|---|
-| `fact_telecom_customer_churn` | Fact | Core table with customer metrics, charges, churn category/reason, and foreign keys |
-| `dim_customer` | Dimension | Demographics — age, gender, marital status, dependents, customer status |
-| `dim_contract` | Dimension | Contract type, payment method, paperless billing |
-| `dim_internet_service` | Dimension | Internet type, streaming, online security, online backup, device protection |
-| `dim_phone_service` | Dimension | Phone service, multiple lines |
-| `dim_population` | Dimension | ZIP code, population, population bracket |
-| `_measures` | Measures Table | All DAX KPIs — churn rate, MRR, lost MRR, LTV, net revenue, retention rate, etc. |
-
-### Key Fact Table Fields
-- `Avg Monthly GB Download` — data usage metric
-- `Avg Monthly Long Distance Charges` — LD usage indicator
-- `Churn Category` / `Churn Reason` — why customers left
-- `Extra Data Charges Bracket` / `GBs Usage Bracket` — usage segmentation
-- `Has Refund` — refund flag for retention correlation
-
-### DAX Measures
-`churn_rate` · `lost MRR` · `MRR` · `Net Revenue` · `revenue lost` · `Retention Rate` · `Revenue per customer` · `Average Monthly Charges` · `Average Tenure Months` · `joined_customer` · `Churn_customers`
-
----
-
-## 🗂️ Repository Structure
-
-```
-telecom-churn-analysis/
-│
-├── dashboards/                  # Power BI dashboard screenshots & schema
-│   ├── 01_overview.png
-│   ├── 02_revenue.png
-│   ├── 03_customers.png
-│   ├── 04_details.png
-│   ├── 05_more_details.png
-│   └── schema.png
-│
-├── docs/
-│   ├── full_analysis.md         # Complete insights & findings
-│   └── data_dictionary.md       # Field definitions and descriptions
-│
-├── recommendations/
-│   ├── tier1_immediate.md       # Actions for next 30 days
-│   ├── tier2_short_term.md      # Actions for 60–90 days
-│   └── tier3_medium_term.md     # Actions for 6 months+
-│
-├── data/
-│   └── schema.md                # Dataset schema overview
-│
-├── INSIGHTS.md                  # Key findings quick reference
-├── setup_repo.sh                # This script
-└── README.md
-```
-
----
-
-## 📈 Executive Summary
+A full-scale data engineering and business intelligence project analyzing **11.1 million restaurant transactions** across a multi-branch Egyptian restaurant chain. Raw data (~1.5 GB across 9 files) was uploaded to **Databricks**, merged and transformed using **Spark SQL**, then connected live to a **4-page interactive Power BI dashboard** — uncovering critical insights around revenue patterns, branch performance, product mix, customer satisfaction, and profitability.
 
 | Metric | Value |
-|---|---|
-| **Total Customers** | 7,043 |
-| **Churned** | 1,869 |
-| **Stayed** | 4,720 |
-| **Joined** | 454 |
-| **Overall Churn Rate** | 26.54% |
-| **Retention Rate** | 71.63% |
-| **Total Revenue** | $21.37M |
-| **Revenue Lost to Churn** | $3.68M (lifetime) |
-| **Monthly Revenue Lost (MRR)** | $137,087 |
-| **Avg LTV — Stayed** | $3,736 |
-| **Avg LTV — Churned** | $1,971 |
+|--------|-------|
+| Total Revenue | EGP 2.90 Billion |
+| Total Orders | 11.1 Million |
+| Total Customers | 200K |
+| Average Order Value | EGP 260.87 |
+| Profit Margin | 94.63% |
+| Branches | 6 |
+| Categories | 5 |
+| Menu Items | 15 |
+| Total Quantity Sold | 35.6 Million |
 
 ---
 
-## 🔑 Top 5 Key Findings
+## 🏗️ Architecture & Pipeline
 
-### 1. 🔴 Contract Type is the #1 Churn Predictor
-| Contract | Churn Rate | Avg LTV | Avg Tenure |
-|---|---|---|---|
-| Month-to-Month | 28.37% | $1,910 | 19.3 months |
-| One Year | Lower | $4,043 | 41.9 months |
-| Two Year | Lowest | $4,854 | 54.5 months |
+```
+Raw Data (1.5 GB)          Databricks                  Power BI
+──────────────────    ────────────────────────    ──────────────────────
+7 CSV Files        →  Upload to DBFS           →  4-Page Interactive
+2 JSON Files          Spark SQL Merge &            Dashboard (Live)
+                      Transformation
+                      (Delta Lake)
+```
 
-> **Critical:** First 6 months for month-to-month customers show **84–90% churn rate**.
+### Data Flow Steps
 
----
-
-### 2. 🛡️ Premium Services are the Retention Goldmine
-| Premium Services | Churn Rate | Avg LTV |
-|---|---|---|
-| 0 Services | 33.59% | $1,504 |
-| 1 Service | **41.61% ⚠️ HIGHEST** | $2,664 |
-| 2 Services | 24.33% | $4,148 |
-| 3 Services | 12.51% | $5,394 |
-| 4 Services | **5.32% ✅ LOWEST** | $7,116 |
-
-> **Danger Zone:** 1 premium service = highest churn. Customers are testing, not committed.
+1. **Ingestion** — Uploaded all 9 source files to Databricks File System (DBFS)
+2. **Parsing** — Read CSVs with automatic schema inference; parsed nested JSON files
+3. **Merging** — Unified all tables via Spark SQL JOINs into a single master analytical table (~11M rows)
+4. **Enrichment** — Computed derived fields: profit margin %, weekend/weekday flag, order type labels, hourly aggregations
+5. **Connection** — Linked Power BI directly to Databricks via Partner Connect for a live data connection
 
 ---
 
-### 3. 👨‍👩‍👧 Family Customers are 5× More Loyal
-| Dependents | Churn Rate |
-|---|---|
-| 0 Dependents | 34.97% |
-| 1 Dependent | 7.22% |
-| 2+ Dependents | 6.66% |
+## 📊 Power BI Dashboard
+
+The dashboard spans **4 pages**, each with shared cross-filter slicers for:
+**Year · Month · Day · Branch · Category · Payment Method**
 
 ---
 
-### 4. 🔗 Referrals are the Strongest Retention Signal
-| Referrals | Churn Rate | Avg LTV |
-|---|---|---|
-| 0 | 36.11% | $2,432 |
-| 1 | 47.34% (anomaly) | — |
-| 2–3 | 12.18% | $4,164 |
-| 4+ | **3.70%** | $4,404 |
+### Page 1 — Overview
+![Overview](screenshots/telecom%20overview.png)
 
-> Customers with 4+ referrals have **10× lower churn** than zero-referral customers.
+**KPIs:** Total Revenue (EGP 2.90B) · Average Order Value (EGP 260.87) · Profit Margin (94.63%) · Average Price (EGP 86) · Revenue per Customer (EGP 14.49K)
 
----
-
-### 5. 💸 Refunds Reduce Churn by 29%
-Customers who received refunds churn at **20.58%** vs **29.03%** for those who didn't.
-Refunds signal responsiveness — customers feel heard and valued.
+**Visuals:**
+- 📈 Line chart: Total revenue by date (2020–2025) — flat growth trajectory
+- 📊 Bar chart: Revenue by menu item — Kebab leads at ~EGP 510M
+- 🟩 Treemap: Revenue by category — Grills (EGP 1.01B) · Tagines (EGP 0.81B) · Poultry (EGP 0.54B) · Starters (EGP 0.34B) · Beverages (EGP 0.20B)
+- 📊 Bar chart: Revenue by branch — Cairo dominates, Assiut lowest
+- 🍩 Donut: Payment split — Cash 50% · Card 30% · Wallet 20%
 
 ---
 
-## 💰 Financial Impact
+### Page 2 — Customer
+![Customer](screenshots/telecom%20customer.png)
 
-| Scenario | Customers Retained | Revenue Saved (Annual) |
-|---|---|---|
-| 10% Churn Reduction | 187 | $164,504 |
-| 20% Churn Reduction | 374 | $329,008 |
-| Premium Bundle Upsell (500 customers) | 180 additional | $1.3M saved |
+**KPIs:** Total Orders (11.1M) · Total Customers (200K) · Average Discount (3.6%) · Revenue per Customer (EGP 14.49K) · Total Revenue (EGP 2.90B)
 
-**Expected Total Year 1 Impact with full program:**
-- 🧑‍🤝‍🧑 **1,500+ customers retained**
-- 💵 **$3.0M+ in prevented churn**
-- 📈 **$5.0M+ in LTV increases from upsells**
-- 🏆 **$8.0M+ total financial impact**
-- 📊 **5.3× ROI** on ~$1.5M investment
+**Visuals:**
+- 📈 Line chart: Orders by hour — dual peaks at 13:00–16:00 and 19:00–23:00
+- 📈 Line chart: Average order value by month — peaks around month 9–10
+- 📊 Bar chart: Rating distribution — 4-star dominant, 5-star underrepresented
+- 🍩 Donut: Revenue by order type — Dine-in 39.98% · Takeaway 30.03% · Delivery 29.99%
 
 ---
 
-## 🚨 High-Risk Segments
+### Page 3 — Details
+![Details](screenshots/telecom%20details.png)
 
-| Segment | Size | Churn Risk | Revenue at Risk |
-|---|---|---|---|
-| New Month-to-Month Customers | 1,095 | 71.32% | $428K |
-| Single Seniors 65+ | 546 | 50.92% | $1.5M |
-| San Diego Market | 285 | 66.55% | $1.1M |
-| Light Data Users (<10 GB) | 904 | 40.38% | $3.1M |
-| 1 Premium Service Customers | 1,370 | 41.61% | $3.7M |
+**KPIs:** Total Items (15) · Total Quantity Sold (35.6M) · Branches (6) · Categories (5) · Total Revenue (EGP 2.90B)
 
----
-
-## 🏆 Ideal Customer Profile
-
-| Attribute | Value |
-|---|---|
-| Contract | Two Year |
-| Premium Services | All 4 (Security + Backup + Device Protection + Tech Support) |
-| Streaming | All 3 (TV + Movies + Music) |
-| Demographics | Married, any age |
-| Behavior | 4+ referrals, 30+ GB usage, high long distance |
-| **Expected LTV** | **$7,000+** |
-| **Churn Rate** | **< 5%** |
+**Visuals:**
+- 📊 Bar chart: Items growing vs. declining (slope coefficients) — Stuffed Eggplant declining fastest at -1.33
+- 📊 Bar chart: Items by quantity sold — Mango Juice leads at 4.3M units
+- 📊 Bar chart: Top 5 products by revenue — Kebab · Chicken Tagine · Kofta · Molokhia Tagine · Bamia Tagine
+- 📊 Bar chart: Bottom 5 products — Tea (EGP 20M) · Rural Juice · Rural Salad · Cane Juice · Stuffed Eggplant
 
 ---
 
-## 🗺️ Geographic Insights
+### Page 4 — More Details
+![More Details](screenshots/telecom%20more%20details.png)
 
-- **Best performing:** Small markets (<10K population) — 25.91% churn
-- **Worst performing:** High density (50K+ population) — 32.02% churn
-- **Crisis market:** San Diego — 66.55% churn (285 customers, 185 churned)
-- **Under-penetrated opportunity:** Los Angeles 90011 (101K population, only 5 customers)
+**KPIs:** Total Revenue (EGP 2.90B) · Average Order Value (EGP 260.87) · Total Orders (11.1M) · Average Price (EGP 86) · Total Quantity (35.6M)
 
----
-
-## 🛠️ Tools Used
-
-- **Power BI** — Interactive dashboard development
-- **DAX** — Custom measures and KPI calculations
-- **Data Modeling** — Star schema with customer, service, and geographic dimensions
+**Visuals:**
+- 🕹️ Gauge: Chain-wide average rating — **3.70 / 5.0**
+- 🍩 Donut: Weekend vs. weekday revenue — Weekend 50.03% · Weekday 49.97%
+- 📋 Table: Peak hours by branch — Cairo dominates every top slot
+- 📈 Line chart: Profit margin % by day — Weekends ~95.5%, weekdays ~93.5%
 
 ---
 
-## 📁 Detailed Documentation
+## 🗃️ Data Schema
+![Schema](screenshots/telecom%20schema.png)
 
-- 📄 [Full Analysis & Insights](docs/full_analysis.md)
-- 📋 [Data Dictionary](docs/data_dictionary.md)
-- 🚀 [Tier 1 — Immediate Actions (30 Days)](recommendations/tier1_immediate.md)
-- 📅 [Tier 2 — Short Term (60–90 Days)](recommendations/tier2_short_term.md)
-- 📆 [Tier 3 — Medium Term & Long Term](recommendations/tier3_medium_term.md)
+| File | Type | Description |
+|------|------|-------------|
+| `restaurant_1.csv` – `restaurant_6.csv` | CSV | Branch transaction records |
+| `restaurant_7.csv` | CSV | Additional transaction data |
+| `restaurant_JSON1.json` | JSON | Supplementary dimension data |
+| `restaurant_JSON2.json` | JSON | Supplementary dimension data |
+
+**Total Size:** ~1.5 GB | **Total Rows:** ~11 million
+
+> ⚠️ Raw data files are not tracked due to size. Use Git LFS or store externally.
 
 ---
 
-*Analysis based on 7,043 customer records with 35 attributes including demographics, services, usage patterns, and financial metrics.*
+## 📈 Key Findings & Strategic Analysis
+
+### 1. Revenue — Flat Growth Signals Market Saturation
+- YoY revenue growth ranges from **-3.4% to +2.0%** — market maturity in current locations
+- Average order value stable at EGP 260 — growth must come from acquisition or frequency, not pricing
+- Geographic expansion is now critical; existing markets show saturation
+
+### 2. Branch Performance — The Cairo Advantage
+
+| Branch | Orders/Customer | Revenue/Customer | Avg Rating |
+|--------|----------------|-----------------|-----------|
+| Cairo | 8.93 | EGP 5,071 | 4.0 |
+| Alexandria | — | — | 3.8 |
+| Assiut | 2.58 | EGP 773 | 3.1 |
+
+- Every **0.1 rating point increase ≈ 0.7 additional orders per customer**
+- Assiut requires immediate operational audit or closure within 90 days
+
+### 3. Profit Margin — The Weekend-Weekday Gap
+- Weekends: ~95.5% margin · Weekdays: ~93.5% margin
+- 2% gap × EGP 1.45B weekday revenue = **EGP 34.5M left on the table annually**
+- Weekday discounts (2.59% avg) are backwards — protecting margin, not eroding it, should be the priority
+
+### 4. Customer Satisfaction — Rating Distribution
+
+| Stars | % of Customers |
+|-------|---------------|
+| ⭐⭐⭐⭐⭐ 5 stars | 15% |
+| ⭐⭐⭐⭐ 4 stars | 44% |
+| ⭐⭐⭐ 3 stars | 36.5% |
+| ⭐⭐ 2 stars | 4.1% |
+| ⭐ 1 star | ~0.4% |
+
+- Target: **4.2+ chain-wide** — adds ~EGP 400M in annual revenue
+- 36.5% stuck at 3 stars = biggest single conversion opportunity
+
+### 5. Product Mix — Beverage Underpricing
+- Mango Juice: 4.28M units at only EGP 28.38/unit — massively underpriced
+- No premium beverage tier (EGP 50–80 range completely absent)
+- Raising beverage prices 35% = **+EGP 40M annually**
+- Stuffed Eggplant: steepest decline (-1.33 slope) — candidate for removal
+
+### 6. Cross-Selling — The Single-Item Problem
+- 21.7% of orders (542K transactions) = only one item
+- Converting 50% of single-item to two-item orders = **+EGP 78.6M annually**
+- Current avg: 3.2 items/order — target should be 4–5
+
+### 7. Payment & Order Type
+- 50% cash transactions = half of customers cannot be tracked for personalization
+- All three order types share an identical 3.70 avg rating — no channel service gap
+
+### 8. Peak Hours — Predictable and Manageable
+- 70% of all daily orders fall in **13:00–16:00** and **19:00–23:00**
+- Cairo dominates every peak slot — other branches severely underutilized
+- Top 20 hour-day combinations = only 20.5% of total orders
+
+---
+
+## 🎯 Strategic Recommendations
+
+### Immediate (0–3 Months)
+
+| Action | Estimated Annual Impact |
+|--------|------------------------|
+| Fix Assiut or close it | +EGP 50M |
+| Optimize weekday pricing & reduce discounts | +EGP 35M |
+| Launch cross-sell campaign (POS prompts + staff training) | +EGP 80M |
+| Raise beverage prices 35% + add premium tier | +EGP 40M |
+
+### Medium Term (3–12 Months)
+
+| Action | Estimated Annual Impact |
+|--------|------------------------|
+| Cairo expansion (2–3 new locations) | +EGP 300M |
+| Customer experience overhaul + 5-star guarantee program | +EGP 400M |
+| Digital transformation (loyalty app, cashback, CRM) | +EGP 100M |
+| Menu innovation (desserts, premium grills, remove bottom 20%) | +EGP 150M |
+
+### Long Term (12+ Months)
+
+| Action | Estimated Annual Impact |
+|--------|------------------------|
+| Geographic expansion — new cities + franchise model | +EGP 500M |
+| Brand repositioning to premium traditional cuisine | +20% pricing headroom |
+
+---
+
+## 🛠️ Tech Stack
+
+| Tool | Role |
+|------|------|
+| **Databricks** | Cloud platform — DBFS storage + Spark SQL compute |
+| **Apache Spark** | Distributed processing of 1.5 GB / 11M rows |
+| **Delta Lake** | Managed storage layer on DBFS |
+| **Spark SQL** | Multi-table JOINs, transformation, field enrichment |
+| **Power BI** | 4-page interactive dashboard with 6 cross-filter slicers |
+| **Partner Connect** | Live Databricks → Power BI direct connection |
+
+---
+
+## 🚀 How to Reproduce
+
+### Prerequisites
+- Databricks account (Community Edition or higher)
+- Power BI Desktop
+- The 9 source data files
+
+### Steps
+
+1. **Upload data to DBFS**
+   ```
+   Databricks UI → Data → Add Data → Upload Files
+   Target: dbfs:/FileStore/restaurant/
+   ```
+
+2. **Run the Spark SQL merge pipeline**
+   Open `sql/merge_pipeline.sql` in a Databricks SQL Notebook and execute all cells
+
+3. **Connect Power BI to Databricks**
+   ```
+   Power BI Desktop → Get Data → Databricks
+   Enter server hostname + HTTP path → select master table
+   ```
+
+4. **Open and refresh the dashboard**
+   Open `powerbi/restaurant_dashboard.pbix` and refresh credentials if prompted
+
+---
+
+## 📄 License
+
+MIT License — free to use, modify, and distribute with attribution.
 HEREDOC
 
 # =============================================================
-# INSIGHTS.md
+# sql/merge_pipeline.sql
 # =============================================================
-cat > INSIGHTS.md << 'EOF'
-# 💡 INSIGHTS.md — Quick Reference
+cat > sql/merge_pipeline.sql << 'EOF'
+-- ============================================================
+-- Restaurant Chain Analytics — Spark SQL Merge Pipeline
+-- Run in a Databricks SQL Notebook
+-- ============================================================
 
-> Fast-access summary of the most critical findings from the Telecom Churn Analysis.
+-- Step 1: Load CSV files as temporary views
+CREATE OR REPLACE TEMP VIEW restaurant_1 AS
+SELECT * FROM csv.`dbfs:/FileStore/restaurant/restaurant_1.csv`
+  OPTIONS (header "true", inferSchema "true");
 
----
+CREATE OR REPLACE TEMP VIEW restaurant_2 AS
+SELECT * FROM csv.`dbfs:/FileStore/restaurant/restaurant_2.csv`
+  OPTIONS (header "true", inferSchema "true");
 
-## 🔥 Top 10 Actionable Insights
+CREATE OR REPLACE TEMP VIEW restaurant_3 AS
+SELECT * FROM csv.`dbfs:/FileStore/restaurant/restaurant_3.csv`
+  OPTIONS (header "true", inferSchema "true");
 
-1. **Bundle all 4 premium services** — churn drops from 41.61% (1 service) to 5.32% (4 services)
-2. **Never sell a single premium service** — 1 service = highest churn of any group (41.61%)
-3. **First 6 months are critical** — month-to-month new customers churn at 84–90%
-4. **4+ referrals = 10× lower churn** — 3.70% vs 36.11% for zero referrals
-5. **Families are 5× more loyal** — dependents cut churn from 34.97% to 6.66%
-6. **Refunds reduce churn by 29%** — proactive refund policy = retention tool
-7. **High LD users are whales** — $6,767 LTV, 12.20% churn, 59.5 months tenure
-8. **Light data users are at risk** — <10 GB customers churn at 40.38%
-9. **San Diego is in crisis** — 66.55% churn needs immediate intervention
-10. **Married customers churn at half the rate** of single customers
+CREATE OR REPLACE TEMP VIEW restaurant_4 AS
+SELECT * FROM csv.`dbfs:/FileStore/restaurant/restaurant_4.csv`
+  OPTIONS (header "true", inferSchema "true");
 
----
+CREATE OR REPLACE TEMP VIEW restaurant_5 AS
+SELECT * FROM csv.`dbfs:/FileStore/restaurant/restaurant_5.csv`
+  OPTIONS (header "true", inferSchema "true");
 
-## ⚡ Fastest Wins
+CREATE OR REPLACE TEMP VIEW restaurant_6 AS
+SELECT * FROM csv.`dbfs:/FileStore/restaurant/restaurant_6.csv`
+  OPTIONS (header "true", inferSchema "true");
 
-| Action | Cost | Revenue Impact |
-|---|---|---|
-| Refund policy overhaul | $50K | $400K saved |
-| Overage alert system | Low | $180K saved |
-| Bundle 4 premium services | Low | $2.2M in LTV |
-| San Diego audit | Medium | $177K saved |
+CREATE OR REPLACE TEMP VIEW restaurant_7 AS
+SELECT * FROM csv.`dbfs:/FileStore/restaurant/restaurant_7.csv`
+  OPTIONS (header "true", inferSchema "true");
 
----
+-- Step 2: Load JSON files
+CREATE OR REPLACE TEMP VIEW restaurant_json1 AS
+SELECT * FROM json.`dbfs:/FileStore/restaurant/restaurant_JSON1.json`;
 
-## 🎯 Segment Priority Matrix
+CREATE OR REPLACE TEMP VIEW restaurant_json2 AS
+SELECT * FROM json.`dbfs:/FileStore/restaurant/restaurant_JSON2.json`;
 
-| Priority | Segment | Churn Risk | Revenue at Risk |
-|---|---|---|---|
-| 🔴 Critical | New MTM customers (<6 months) | 71.32% | $428K |
-| 🔴 Critical | Single seniors 65+ | 50.92% | $1.5M |
-| 🔴 Critical | San Diego market | 66.55% | $1.1M |
-| 🟠 High | 1 premium service customers | 41.61% | $3.7M |
-| 🟠 High | Light data users (<10 GB) | 40.38% | $3.1M |
-| 🟢 Protect | 3–4 premium service customers | 5–13% | $9.0M |
+-- Step 3: Union all CSV sources
+CREATE OR REPLACE TEMP VIEW all_transactions AS
+SELECT * FROM restaurant_1
+UNION ALL SELECT * FROM restaurant_2
+UNION ALL SELECT * FROM restaurant_3
+UNION ALL SELECT * FROM restaurant_4
+UNION ALL SELECT * FROM restaurant_5
+UNION ALL SELECT * FROM restaurant_6
+UNION ALL SELECT * FROM restaurant_7;
 
----
+-- Step 4: Build master analytical table with enriched fields
+CREATE OR REPLACE TABLE restaurant_master AS
+SELECT
+  t.*,
 
-## 📐 Churn Risk Profile
+  -- Profit margin %
+  ROUND((t.revenue - t.cost) / NULLIF(t.revenue, 0) * 100, 2)  AS profit_margin_pct,
 
-A customer is **CRITICAL RISK** if they match 5+ of these:
-- [ ] Contract = Month-to-Month
-- [ ] Tenure < 6 months
-- [ ] Referrals = 0
-- [ ] Marital status = Single
-- [ ] Age 65+
-- [ ] No dependents
-- [ ] Premium services = 0 or 1
-- [ ] Data usage < 10 GB
+  -- Weekend / Weekday flag
+  CASE
+    WHEN DAYOFWEEK(t.order_date) IN (1, 7) THEN 'Weekend'
+    ELSE 'Weekday'
+  END AS day_type,
 
----
+  -- Hour of day
+  HOUR(t.order_timestamp) AS order_hour,
 
-## 💎 The Gold Standard Customer
+  -- Order size bracket
+  CASE
+    WHEN t.items_count = 1                  THEN '1 Item'
+    WHEN t.items_count = 2                  THEN '2 Items'
+    WHEN t.items_count BETWEEN 3 AND 5      THEN '3-5 Items'
+    WHEN t.items_count BETWEEN 6 AND 7      THEN '6-7 Items'
+    ELSE '8+ Items'
+  END AS order_size_bracket,
 
-- **Contract:** Two Year
-- **Services:** 4 premium + 3 streaming
-- **Demographics:** Married, any age, with dependents
-- **Behavior:** 4+ referrals, 30+ GB/month, high long distance usage
-- **Result:** $7,000+ LTV | <5% churn | 60+ months tenure
+  j1.population_data,
+  j2.additional_info
+
+FROM all_transactions t
+LEFT JOIN restaurant_json1 j1 ON t.branch_id  = j1.branch_id
+LEFT JOIN restaurant_json2 j2 ON t.customer_id = j2.customer_id;
+
+-- Step 5: Verify row count (~11M expected)
+SELECT COUNT(*) AS total_rows FROM restaurant_master;
 EOF
 
 # =============================================================
-# docs/full_analysis.md
+# data/README.md
 # =============================================================
-cat > docs/full_analysis.md << 'EOF'
-# 📊 Complete Telecom Churn Analysis — Full Insights
+cat > data/README.md << 'EOF'
+# 📦 Data Sources
 
-## Dataset Overview
+Raw data files are **not tracked** in this repository (~1.5 GB total).
 
-| Metric | Value |
-|---|---|
-| Total Customers | 7,043 |
-| Stayed | 4,720 |
-| Churned | 1,869 |
-| Joined | 454 |
-| Overall Churn Rate | 26.54% |
-| Retention Rate | 71.63% |
-| Lifetime Revenue Lost | $3.68M |
-| MRR Lost | $137,087/month |
-| Avg LTV (Stayed) | $3,736 |
-| Avg LTV (Churned) | $1,971 |
+## Files Required
 
----
+| File | Type |
+|------|------|
+| `restaurant_1.csv` – `restaurant_6.csv` | CSV |
+| `restaurant_7.csv` | CSV |
+| `restaurant_JSON1.json` | JSON |
+| `restaurant_JSON2.json` | JSON |
 
-## 1. Contract Type — Strongest Churn Predictor
+## Upload to Databricks
 
-| Contract | Churn Rate | Avg LTV | Avg Tenure |
-|---|---|---|---|
-| Month-to-Month | 28.37% | $1,910 | 19.34 months |
-| One Year | Lower | $4,043 | 41.87 months |
-| Two Year | Lowest | $4,854 | 54.53 months |
+```
+Databricks UI → Data → Add Data → Upload Files
+Target path: dbfs:/FileStore/restaurant/
+```
 
-- Two-year contracts generate **2.5× more LTV** despite lower monthly charges ($61.45 vs $67.19)
-- **Critical Risk Period:** First 6 months for MTM customers: **84–90% churn rate**
-
----
-
-## 2. Premium Services — The Retention Goldmine
-
-| Count | Churn Rate | Avg LTV |
-|---|---|---|
-| 0 | 33.59% | $1,504 |
-| 1 | **41.61% ⚠️** | $2,664 |
-| 2 | 24.33% | $4,148 |
-| 3 | 12.51% | $5,394 |
-| 4 | **5.32% ✅** | $7,116 |
-
-Best combo: Online Security + Online Backup + Device Protection + Premium Tech Support
-470 customers · 5.32% churn · $88.92/month · 61.5 months tenure
-
----
-
-## 3. Streaming Services
-
-| Streaming | Churn Rate | Avg LTV |
-|---|---|---|
-| No Streaming | 36.58% | — |
-| Has Streaming | 31.96% | — |
-| All 3 (TV + Movies + Music) | 27.32% | $5,371 |
-| Only Music Streaming | **67.37% ⚠️** | — |
-
----
-
-## 4. Demographics
-
-| Segment | Churn Rate | Avg LTV |
-|---|---|---|
-| Married (any age) | 14–19% | $3,844–$4,588 |
-| Single (any age) | 30–36% | $2,186–$2,735 |
-| Seniors 65+ Married | 34.98% | $4,588 |
-| Seniors 65+ Single | **50.92% 🚨** | — |
-
----
-
-## 5. Dependents
-
-| Dependents | Churn Rate | Customers |
-|---|---|---|
-| 0 | 34.97% | 5,042 |
-| 1 | 7.22% | 526 |
-| 2+ | 6.66% | 1,021 |
-
-Customers with dependents are **5× more loyal** and stay 7–8 months longer.
-
----
-
-## 6. Referrals
-
-| Referrals | Churn Rate | Avg LTV |
-|---|---|---|
-| 0 | 36.11% | $2,432 |
-| 1 | 47.34% (anomaly) | — |
-| 2–3 | 12.18% | $4,164 |
-| 4+ | **3.70%** | $4,404 |
-
----
-
-## 7. Data Usage
-
-| Usage | Churn Rate |
-|---|---|
-| No Internet | 8.41% |
-| < 10 GB | **40.38% ⚠️** |
-| 10–20 GB | 33.40% |
-| 20–30 GB | 35.39% |
-| 30+ GB | 26.69% |
-
----
-
-## 8. Pricing & Charges
-
-| Monthly Bracket | Churn Rate |
-|---|---|
-| < $30 | 12.21% |
-| $30–$50 | 34.78% |
-| $50–$70 | 21.66% |
-| $70–$90 | **39.84% ⚠️** |
-| $90+ | 33.37% |
-
-| Long Distance | Churn Rate | Avg LTV |
-|---|---|---|
-| No LD | 26.40% | $1,590 |
-| Low ($1–$500) | **44.33%** | $1,457 |
-| Medium ($501–$1,500) | 17.19% | $3,864 |
-| High ($1,500+) | **12.20%** | $6,767 |
-
----
-
-## 9. Refunds
-
-| Status | Churn Rate | Avg LTV |
-|---|---|---|
-| No Refunds | 29.03% | $3,204 |
-| Has Refunds | **20.58% (−29%)** | $3,599 |
-
----
-
-## 10. Geographic Patterns
-
-| Density | Churn Rate |
-|---|---|
-| < 10K population | 25.91% ✅ |
-| 50K+ population | 32.02% |
-
-**Crisis cities:** San Diego 66.55% · Fallbrook 63.41% · Temecula 61.11%
-
----
-
-## 11. Churn Reasons
-
-| Category | Customers | % of Churn |
-|---|---|---|
-| Competitor | 841 | **45%** |
-| Dissatisfaction | 321 | 17% |
-| Attitude | 314 | 17% |
-| Price | 211 | 11% |
-| Other | 182 | 10% |
-
----
-
-## 12. Risk Segmentation
-
-| Tier | Customers | Churn Rate | Revenue at Risk |
-|---|---|---|---|
-| Critical Risk | 1,095 | 71.32% | $428K |
-| High Risk | 1,044 | 47.70% | $1.26M |
-| Low Risk | 4,350 | 13.38% | $19.58M |
+Then run `sql/merge_pipeline.sql` to produce the master analytical table.
 EOF
 
 # =============================================================
-# docs/data_dictionary.md
-# =============================================================
-cat > docs/data_dictionary.md << 'EOF'
-# 📋 Data Dictionary
-
-7,043 customer records · 35 attributes
-
-## Customer Demographics
-| Field | Type | Description |
-|---|---|---|
-| `customer_id` | String | Unique identifier |
-| `age` | Integer | Customer age |
-| `gender` | String | Male / Female |
-| `married` | Boolean | Marital status |
-| `dependents` | Integer | Number of dependents (0–7+) |
-| `city` | String | City |
-| `zip_code` | String | ZIP code |
-| `population` | Integer | ZIP area population |
-
-## Account Information
-| Field | Type | Description |
-|---|---|---|
-| `customer_status` | String | Stayed / Churned / Joined |
-| `churn_category` | String | Competitor / Dissatisfaction / Attitude / Price / Other |
-| `churn_reason` | String | Specific churn reason |
-| `tenure_months` | Integer | Months with the company |
-| `contract` | String | Month-to-Month / One Year / Two Year |
-| `payment_method` | String | Mailed Check / Bank Withdrawal / Credit Card |
-| `offer` | String | Promotional offer (A–E / None) |
-| `num_referrals` | Integer | Friends referred |
-
-## Services
-| Field | Type | Description |
-|---|---|---|
-| `internet_type` | String | Fiber Optic / DSL / Cable / No Internet |
-| `online_security` | Boolean | Online Security add-on |
-| `online_backup` | Boolean | Online Backup add-on |
-| `device_protection` | Boolean | Device Protection add-on |
-| `premium_tech_support` | Boolean | Premium Tech Support add-on |
-| `streaming_tv` | Boolean | TV Streaming |
-| `streaming_movies` | Boolean | Movie Streaming |
-| `streaming_music` | Boolean | Music Streaming |
-| `unlimited_data` | Boolean | Unlimited data plan |
-| `phone_service` | Boolean | Phone service |
-| `multiple_lines` | Boolean | Multiple lines |
-
-## Usage & Financial
-| Field | Type | Description |
-|---|---|---|
-| `avg_monthly_gb_download` | Float | Monthly data usage (GB) |
-| `avg_monthly_long_distance_charges` | Float | Monthly LD charges ($) |
-| `monthly_charge` | Float | Current monthly bill ($) |
-| `total_charges` | Float | Total billed to date ($) |
-| `total_revenue` | Float | Total revenue incl. extras ($) |
-| `total_refunds` | Float | Total refunds issued ($) |
-| `total_extra_data_charges` | Float | Overage charges ($) |
-| `total_long_distance_charges` | Float | Cumulative LD charges ($) |
-
-## Derived / Engineered Fields
-| Field | Description |
-|---|---|
-| `premium_service_count` | Sum of 4 premium services (0–4) |
-| `has_streaming` | Any streaming service active |
-| `gb_usage_bracket` | Light / Medium / Heavy / No Internet |
-| `population_bracket` | <10K / 10–30K / 30–50K / 50K+ |
-| `ld_charges_bracket` | No LD / Low / Medium / High (Whale) |
-| `extra_data_bracket` | No Overages / Small / Large |
-EOF
-
-# =============================================================
-# recommendations/tier1_immediate.md
-# =============================================================
-cat > recommendations/tier1_immediate.md << 'EOF'
-# 🚀 Tier 1 — Immediate Actions (Next 30 Days)
-
-## 1. Premium Service Bundle Strategy
-- Create "Ultimate Protection Bundle" (all 4 services) at 15–20% discount
-- Never sell just 1 premium service — it pushes churn to 41.61%
-- Target 1–2 service customers for immediate upgrade
-- **Impact:** Churn 41.61% → 5.32% · LTV $2,664 → $7,116 · ROI $2.2M
-
-## 2. First 6 Months Intensive Onboarding
-- Flag all MTM customers in first 6 months (84–90% churn risk)
-- Weekly check-in calls for first 3 months
-- Contract upgrade incentives at month 3
-- Assign dedicated onboarding specialist
-- **Impact:** Retain 340 customers = $670K saved/year
-
-## 3. San Diego Market Crisis Response
-- Immediate service quality audit (66.55% churn)
-- Competitive analysis of local market
-- Win-back campaign for recently churned customers
-- **Impact:** Retain 90 customers = $177K saved
-
-## 4. Overage Charge Prevention Program
-- Alert customers at 80% of data limit
-- Auto-offer unlimited upgrade BEFORE overages hit
-- "Forgive first overage" policy
-- **Impact:** Retain 54 customers = $180K saved
-
-## 5. Refund Policy Overhaul
-- Empower support to issue refunds up to $50 without approval
-- Market "100% Satisfaction Guarantee"
-- Train support on proactive refund offers
-- **Impact:** Cost $50K · Return $400K in retained revenue
-EOF
-
-# =============================================================
-# recommendations/tier2_short_term.md
-# =============================================================
-cat > recommendations/tier2_short_term.md << 'EOF'
-# 📅 Tier 2 — Short Term Actions (60–90 Days)
-
-## 6. Referral Program Enhancement
-- Escalating rewards: $25 (1st) · $50 (2nd–3rd) · $100 (4th+)
-- "Referral Champion" VIP tier
-- Gamified leaderboards and monthly prizes
-- **Impact:** Retain 200 customers = $880K saved
-
-## 7. Data Usage Engagement Program
-- Flag light users (<10 GB) proactively
-- Offer plan downgrades or usage tips
-- VIP treatment for 30+ GB heavy users
-- **Impact:** Retain 94 customers = $319K saved
-
-## 8. Long Distance User VIP Program
-- Identify $1,500+/year LD users (whales — $6,767 LTV)
-- Create "Business Plus" / "Family Connect" premium plans
-- Dedicated account managers + quarterly retention calls
-- **Impact:** Retain 97 customers = $657K saved
-
-## 9. Family & Dependent Targeting
-- Family bundle packages with multi-line discounts
-- "Family Safety Package" (all 4 premium + parental controls)
-- Partner with schools and community organizations
-- **Impact:** $3.4M in LTV over 3 years
-
-## 10. Senior Customer Retention Program
-- Simplified billing and support for 65+ customers
-- Dedicated senior support line
-- Proactive outreach to single seniors (50.92% churn risk)
-- **Impact:** Retain 87 customers = $238K saved
-EOF
-
-# =============================================================
-# recommendations/tier3_medium_term.md
-# =============================================================
-cat > recommendations/tier3_medium_term.md << 'EOF'
-# 📆 Tier 3 — Medium Term (6 Months) & Tier 4 — Long Term (12+ Months)
-
-## Tier 3
-
-### 11. Contract Migration Program
-- 2 months free for switching to 2-year contract
-- "Lock in your rate" campaign
-- Auto upgrade offer at 12-month tenure
-- **Impact:** Convert 1,000 MTM → 2-year · LTV $1,910 → $4,854 · +$2.9M
-
-### 12. Streaming Bundle Strategy
-- Never sell single streaming services
-- "Entertainment Plus" bundle (all 3) at 20% discount
-- Cross-sell to single-service customers
-- **Impact:** Retain 177 customers = $951K saved
-
-### 13. Price Optimization — $70–$90 Bracket
-- Audit highest-churn pricing bracket (39.84%)
-- Add value or lower price; A/B test strategies
-- Consider price-lock guarantees for contract upgrades
-- **Impact:** Retain 170 customers = $550K saved
-
----
-
-## Tier 4
-
-### 14. Geographic Expansion
-- Prioritize small markets (<10K pop.) — 25.91% churn vs 32.02% urban
-- Target under-penetrated high-population ZIP codes
-- **Impact:** 5,000 new customers · +$18.6M LTV over 5 years
-
-### 15. Competitive Response Program
-- Monitor competitor offers (45% of churn is competitor-driven)
-- Price match guarantee for loyal customers
-- Proactive retention offers 90 days before renewal
-- **Impact:** Retain 281 customers = $554K saved
-
-### 16. Service Quality Improvement
-- Address dissatisfaction + attitude churn (34% of churners)
-- Support agent training, reduced wait times, CSAT tracking
-- **Impact:** Retain 159 customers = $313K saved
-
----
-
-## Implementation Timeline
-
-| Month | Actions |
-|---|---|
-| 1 | Premium Bundle · Onboarding · San Diego · Refund Policy |
-| 2 | Overage Prevention · Data Engagement · Referrals |
-| 3 | LD VIP · Senior Retention · Family Targeting |
-| 4–6 | Contract Migration · Streaming Bundle · Price Optimization |
-| 7–12 | Geographic Expansion · Competitive Response · Service Quality |
-
-## Year 1 Expected Impact
-
-| Metric | Target |
-|---|---|
-| Customers Retained | 1,500+ |
-| Revenue Saved | $3.0M+ |
-| LTV Increase (Upsells) | $5.0M+ |
-| **Total Impact** | **$8.0M+** |
-| Investment | ~$1.5M |
-| **ROI** | **5.3×** |
-EOF
-
-# =============================================================
-# data/schema.md
-# =============================================================
-cat > data/schema.md << 'EOF'
-# 🗄️ Dataset Schema
-
-7,043 records · 35 attributes
-
-## Record Counts
-| Status | Count |
-|---|---|
-| Stayed | 4,720 |
-| Churned | 1,869 |
-| Joined | 454 |
-
-## Key Aggregates
-| Metric | Value |
-|---|---|
-| Total Revenue | $21.37M |
-| Net Revenue | $17.69M |
-| Revenue Lost | $3.68M |
-| MRR Lost | $137,087 |
-| Avg Monthly Charge | $63.60 |
-| Avg Tenure | 32 months |
-
-## Contract Distribution
-- Month-to-Month: 42.29% of revenue
-- Two Year: 28.84%
-- One Year: 28.88%
-
-## Payment Methods
-- Bank Withdrawal: 59.3%
-- Mailed Check: 38.17%
-- Credit Card: 2.54%
-
-## Churn Reasons
-- Competitor: 45%
-- Dissatisfaction: 17%
-- Attitude: 17%
-- Price: 11%
-- Other: 10%
-EOF
-
-# =============================================================
-# Copy dashboard images (place them in the same folder as this script)
+# Copy dashboard screenshots (exact names from GitHub upload)
 # =============================================================
 echo ""
-echo "📸 Copying dashboard images..."
+echo "📸 Copying dashboard screenshots..."
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 images=(
-  "01_overview.png"
-  "02_revenue.png"
-  "03_customers.png"
-  "04_details.png"
-  "05_more_details.png"
-  "schema.png"
+  "telecom overview.png"
+  "telecom customer.png"
+  "telecom details.png"
+  "telecom more details.png"
+  "telecom schema.png"
 )
 
 for img in "${images[@]}"; do
   if [ -f "$SCRIPT_DIR/$img" ]; then
-    cp "$SCRIPT_DIR/$img" dashboards/
+    cp "$SCRIPT_DIR/$img" "screenshots/$img"
     echo "  ✅ $img"
   else
-    echo "  ⚠️  $img not found — place it next to this script and re-run, or add it manually to dashboards/"
+    echo "  ⚠️  '$img' not found — place it next to this script and re-run"
   fi
 done
 
@@ -815,15 +452,23 @@ done
 echo ""
 echo "📦 Creating initial commit..."
 git add .
-git commit -m "feat: initial commit — Telecom Churn Analysis
+git commit -m "feat: initial commit — Restaurant Chain Performance Analytics
 
-- Power BI dashboards (overview, revenue, customers, details, more details)
-- Star schema diagram
-- Full churn analysis across 12 dimensions
-- Tiered recommendations (30 days → 12 months)
-- Data dictionary and schema docs
-- Expected impact: \$8M+ Year 1, 5.3x ROI"
+- 4-page Power BI dashboard (Overview, Customer, Details, More Details)
+- Data schema diagram
+- Spark SQL merge pipeline (9 sources → 11M row master table)
+- Full business analysis: revenue, branches, products, satisfaction
+- Tiered strategic recommendations (0–3 months to 12+ months)
+- Data dictionary and pipeline reproduction steps"
 
+echo ""
+echo "✅ Repository ready!"
+echo ""
+echo "👉 Next steps to push to GitHub:"
+echo "   1. Create a new repo at https://github.com/new"
+echo "   2. cd into restaurant-analytics/ then run:"
+echo "      git remote add origin https://github.com/YOUR_USERNAME/restaurant-analytics.git"
+echo "      git push -u origin main"
 echo ""
 echo "✅ Repository ready!"
 echo ""
